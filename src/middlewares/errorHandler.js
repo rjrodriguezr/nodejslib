@@ -7,7 +7,7 @@ const logger = require('../../lib/logger'); // Ajusta la ruta si es necesario
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
     const statusCode = err.status || err.statusCode || 500; // Priorizar status del error, sino 500
-    const environment = process.env.NODE_ENV || 'prd';
+    const environment = process.env.ENVIRONMENT || 'prd';
 
     // Loguear el error, incluyendo el stack trace para depuración    
     if (environment === 'development' || environment === 'dev') {
