@@ -1,7 +1,7 @@
 const axiosClient = require('./lib/axiosClient');
 const catalog = require('./lib/catalog');
 const constants = require('./lib/constants');
-const controllers = require('./src/controllers');
+const {BaseController} = require('./src/controllers');
 const crypt = require('./lib/crypt');
 const logger = require('./lib/logger');
 const middlewares = require('./src/middlewares');
@@ -14,12 +14,12 @@ module.exports = {
   axiosClient,
   catalog,
   constants,
-  ...controllers,
+  BaseController,
   crypt,
   logger,
-  ...middlewares,
+  middlewares,
   mongoDBService,
   redisService,
   serviceRegistry,
-  ...validators,
+  validators,
 };
