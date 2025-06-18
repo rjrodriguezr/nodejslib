@@ -1,9 +1,9 @@
-const { internalApiClient } = require('./axiosClient');
+const { authClient } = require('./authClient');
 const { errorHandler } = require('./errorHandler');
 const { modelAuditPlugin } = require('./modelAuditPlugin');
 
 module.exports = {
-    internalApiClient,
+    authClient,
     errorHandler,
     modelAuditPlugin
 };
