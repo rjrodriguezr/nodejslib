@@ -1,9 +1,10 @@
 const authClient = require('./authClient');
-const errorHandler = require('./errorHandler');
+const { middlewareHandleError, responseHandleError } = require('./errorHandler');
 const modelAuditPlugin = require('./modelAuditPlugin');
 
 module.exports = {
     authClient,
-    errorHandler,
+    middlewareHandleError,
+    responseHandleError,
     modelAuditPlugin
 };
