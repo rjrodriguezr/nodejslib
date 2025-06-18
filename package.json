@@ -1,6 +1,6 @@
 {
   "name": "nodejslib",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Libreria de utilidades para aplicaciones back-end con nodejs",
   "main": "./index.js",
   "scripts": {

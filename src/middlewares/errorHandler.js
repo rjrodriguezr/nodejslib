@@ -1,5 +1,4 @@
 const logger = require('../../lib/logger'); // Ajusta la ruta si es necesario
-const config = require('../../config'); // Para determinar el entorno (development/production)
 
 /**
  * Middleware de manejo de errores global.
@@ -8,16 +7,13 @@ const config = require('../../config'); // Para determinar el entorno (developme
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
     const statusCode = err.status || err.statusCode || 500; // Priorizar status del error, sino 500
-    const environment = config.server.env || process.env.NODE_ENV || 'development';
+    const environment = process.env.NODE_ENV || 'prd';
 
-    // Loguear el error, incluyendo el stack trace para depuración
-    logger.error(`[ErrorHandler] Status: ${statusCode}, Message: ${err.message}, Path: ${req.originalUrl}, Method: ${req.method}`);
+    // Loguear el error, incluyendo el stack trace para depuración    
     if (environment === 'development' || environment === 'dev') {
         logger.error('[ErrorHandler] Stack Trace:', err.stack);
     } else {
-        // En producción, podrías querer loguear menos detalles del stack a la consola
-        // y más a un sistema de logging centralizado si el error es crítico.
-        // logger.error('[ErrorHandler] Stack Trace (first line for context):', err.stack ? err.stack.split('\n')[0] : 'No stack available');
+        logger.error(`[ErrorHandler] Status: ${statusCode}, Message: ${err.message}, Path: ${req.originalUrl}, Method: ${req.method}`);
     }
 
 
