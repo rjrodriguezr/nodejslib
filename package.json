@@ -1,0 +1,32 @@
+{
+  "name": "thothify-library",
+  "version": "3.0.1",
+  "description": "thothify library",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rjrodriguezr/thothify-library.git"
+  },
+  "keywords": [
+    "thothify",
+    "library"
+  ],
+  "author": "rjrodriguezr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rjrodriguezr/thothify-library/issues"
+  },
+  "homepage": "https://github.com/rjrodriguezr/thothify-library#readme",
+  "peerDependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "ioredis": "^5.6.1",
+    "mongoose": "^8.10.1",
+    "winston": "^3.17.0"
+  }
+}
