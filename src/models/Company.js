@@ -1,6 +1,6 @@
 const logger = require('../../lib/logger');
 const { Schema, model } = require('mongoose');
-const { modelAuditPlugin } = require('../middlewares/modelAuditPlugin');
+const modelAuditPlugin = require('../middlewares/modelAuditPlugin');
 
 const CompanySchema = Schema({
   name: {
