@@ -1,6 +1,6 @@
 {
   "name": "nodejslib",
-  "version": "3.1.6",
+  "version": "3.1.7",
   "description": "Libreria de utilidades para aplicaciones back-end con nodejs",
   "main": "./index.js",
   "scripts": {
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/rjrodriguezr/thothify-library#readme",
   "peerDependencies": {
     "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
