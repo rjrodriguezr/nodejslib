@@ -1,6 +1,6 @@
 const logger = require('../../lib/logger');
 const { Schema, model } = require('mongoose');
-const { modelAuditPlugin } = require('../middlewares/modelAuditPlugin');
+const { modelAuditPlugin } = require('../middlewares');
 const { encrypt, decrypt, hash } = require('../../lib/crypt'); // Asegúrate que la ruta sea correcta
 
 const CustomerSchema = Schema({
