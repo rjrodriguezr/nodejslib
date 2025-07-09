@@ -1,5 +1,5 @@
 const logger = require('../../lib/logger');
-const {headers, WEBHOOK_SOURCE_TYPE} = require('../../lib/constants');
+const { headers, WEBHOOK_SOURCE_TYPE } = require('../../lib/constants');
 /**
  * @module authClient
  * @description Middleware de Express para autenticar y autorizar peticiones internas entre servicios.
@@ -28,6 +28,7 @@ const {headers, WEBHOOK_SOURCE_TYPE} = require('../../lib/constants');
 const authClient = async (req, res, next, token) => {
     logger.debug("[authClient] INICIO de la validacion del request");
     const internalHeader = req.header(headers.INTERNAL_REQUEST);
+    logger.silly({ msg: "[authClient]", token, headers_INTERNAL_REQUEST: headers.INTERNAL_REQUEST, internalHeader });
     // token === this.service.token está garantizado por el método start()
     if (internalHeader !== token) {
         logger.warn(`[authClient] Intento de acceso no autorizado. Header '${headers.INTERNAL_REQUEST}' no coincide con el token esperado.`);
