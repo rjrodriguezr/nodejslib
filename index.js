@@ -1,6 +1,6 @@
 const axiosClient = require('./lib/axiosClient');
 const catalog = require('./lib/catalog');
-const constants = require('./lib/constants');
+const { constants } = require('./lib/constants');
 const { BaseController } = require('./src/controllers');
 const { Company } = require('./src/models');
 const crypt = require('./lib/crypt');
