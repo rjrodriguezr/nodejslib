@@ -1,3 +1,4 @@
+console.log('--- EXECUTING LATEST VERSION OF nodejslib ---');
 const axiosClient = require('./lib/axiosClient');
 const catalog = require('./lib/catalog');
 const constants = require('./lib/constants');
