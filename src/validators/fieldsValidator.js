@@ -88,7 +88,7 @@ const validateEmail = (attr, _, required = true) => {
  * @param {'body' | 'param' | 'query'} source - Fuente del valor ('body', 'param' o 'query')
  * @param {string} field - Nombre del campo a validar (por defecto: "id")
  */
-const validateMongoId = (source, field = "id") => {
+const validateMongoId = (source, field = "_id") => {
     let location;
 
     switch (source) {
