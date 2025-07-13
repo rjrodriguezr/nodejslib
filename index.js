@@ -23,7 +23,7 @@ module.exports = {
   catalog,
   constants,
   BaseController,
-  Company,
+  Company, User, Customer,
   crypt,
   logger,
   authClient, middlewareHandleError, modelAuditPlugin, responseHandleError,
