@@ -22,18 +22,17 @@ const { headers, WEBHOOK_SOURCE_TYPE } = require('../../lib/constants');
  * @param {import('express').Request} req - El objeto de la petición de Express. Se espera que contenga cabeceras personalizadas.
  * @param {import('express').Response} res - El objeto de la respuesta de Express.
  * @param {import('express').NextFunction} next - La función para pasar al siguiente middleware.
- * @param {string} token - El token de autenticación secreto que se espera en la cabecera `X-Internal-Request`.
  * @returns {Promise<void>} No devuelve un valor directamente, sino que finaliza la petición con un error o la pasa al siguiente middleware.
  */
-const authClient = async (req, res, next, token) => {
+const authClient = async (req, res, next) => {
     logger.debug("[authClient] INICIO de la validacion del request");
-    logger.silly({ msg: "[authClient]", token, headers: req.headers });
-    const internalHeader = req.header(headers.INTERNAL_REQUEST);    
-    // token === this.service.token está garantizado por el método start()
-    if (internalHeader !== token) {
-        logger.warn(`[authClient] Intento de acceso no autorizado. Header '${headers.INTERNAL_REQUEST}' no coincide con el token esperado.`);
-        return res.status(401).json({ error: 'No se ha recibido el header de autenticación o es incorrecto' });
-    }
+    // logger.silly({ msg: "[authClient]", token, headers: req.headers });
+    // const internalHeader = req.header(headers.INTERNAL_REQUEST);    
+    // // token === this.service.token está garantizado por el método start()
+    // if (internalHeader !== token) {
+    //     logger.warn(`[authClient] Intento de acceso no autorizado. Header '${headers.INTERNAL_REQUEST}' no coincide con el token esperado.`);
+    //     return res.status(401).json({ error: 'No se ha recibido el header de autenticación o es incorrecto' });
+    // }
     // Extraer datos de usuario desde headers personalizados    
     const sourceType = req.header(headers.SOURCE_TYPE);
     if (sourceType && sourceType === WEBHOOK_SOURCE_TYPE) {
