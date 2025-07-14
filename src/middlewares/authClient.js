@@ -40,26 +40,17 @@ const authClient = async (req, res, next, token) => {
         logger.verbose(`[authClient] sourceType: ${sourceType}, ignorando la validacion de seguridad de llamados internos `);
     } else {
         logger.verbose("[authClient] No sourceType presente por lo que se procesan cabeceras de llamados internos");
-        const companyRaw = req.header(headers.USER_COMPANY);
+        const companyId = req.header(headers.COMPANY_ID);
         const username = req.header(headers.USER_NAME);
-        const rolesRaw = req.header(headers.USER_ROLES);
+        const roles = req.header(headers.USER_ROLES); // el gateway devuelve como una lista de Strings
 
-        if (!(companyRaw || username || rolesRaw)) {
+        if (!(companyId || username || roles)) {
             return res.status(401).json({ error: 'Faltan Headers de datos del usuario' });
-        }
-
-        let roles = [], company;
-        try {
-            if (companyRaw) company = JSON.parse(companyRaw);
-            if (rolesRaw) roles = JSON.parse(rolesRaw);
-        } catch (e) {
-            logger.error({ msg: 'Error al parsear el header X-User-Company o X-User-Roles como JSON', e });
-            return res.status(401).json({ error: 'Error al parsear el header X-User-Company o X-User-Roles como JSON' });
         }
 
         // Agregar objeto `token` al request
         req.token = {
-            company,
+            companyId,
             username,
             roles,
         };
