@@ -27,8 +27,8 @@ const { headers, WEBHOOK_SOURCE_TYPE } = require('../../lib/constants');
  */
 const authClient = async (req, res, next, token) => {
     logger.debug("[authClient] INICIO de la validacion del request");
-    const internalHeader = req.header(headers.INTERNAL_REQUEST);
-    logger.silly({ msg: "[authClient]", token, headers_INTERNAL_REQUEST: headers.INTERNAL_REQUEST, internalHeader });
+    logger.silly({ msg: "[authClient]", token, headers: req.headers });
+    const internalHeader = req.header(headers.INTERNAL_REQUEST);    
     // token === this.service.token está garantizado por el método start()
     if (internalHeader !== token) {
         logger.warn(`[authClient] Intento de acceso no autorizado. Header '${headers.INTERNAL_REQUEST}' no coincide con el token esperado.`);
