@@ -40,7 +40,7 @@ const authClient = async (req, res, next) => {
     } else {
         logger.verbose("[authClient] No sourceType presente por lo que se procesan cabeceras de llamados internos");
         const companyId = req.header(headers.COMPANY_ID);
-        const username = req.header(headers.USER_NAME);
+        const username = req.header(headers.USER_ID);
         const roles = req.header(headers.USER_ROLES); // el gateway devuelve como una lista de Strings
 
         if (!(companyId || username || roles)) {
