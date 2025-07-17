@@ -40,17 +40,17 @@ const authClient = async (req, res, next) => {
     } else {
         logger.verbose("[authClient] No sourceType presente por lo que se procesan cabeceras de llamados internos");
         const companyId = req.header(headers.COMPANY_ID);
-        const username = req.header(headers.USER_ID);
+        const userId = req.header(headers.USER_ID);
         const roles = req.header(headers.USER_ROLES); // el gateway devuelve como una lista de Strings
 
-        if (!(companyId || username || roles)) {
+        if (!(companyId || userId || roles)) {
             return res.status(401).json({ error: 'Faltan Headers de datos del usuario' });
         }
 
         // Agregar objeto `token` al request
         req.token = {
             companyId,
-            username,
+            userId,
             roles,
         };
         logger.verbose(req.token);

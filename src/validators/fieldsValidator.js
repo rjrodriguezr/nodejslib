@@ -88,7 +88,7 @@ const validateEmail = (attr, _, required = true) => {
  * @param {'body' | 'param' | 'query'} source - Fuente del valor ('body', 'param' o 'query')
  * @param {string} field - Nombre del campo a validar (por defecto: "id")
  */
-const validateMongoId = (source, field = "_id") => {
+const validateMongoId = (source, field = "_id", required = true) => {
     let location;
 
     switch (source) {
@@ -104,11 +104,14 @@ const validateMongoId = (source, field = "_id") => {
             break;
     }
 
-    return location(field)
-        .exists().withMessage(`El campo '${field}' es obligatorio`)
-        .isMongoId().withMessage(`El campo '${field}' no es un ObjectId válido`);
+    let validator = location(field);
+    if (required) {
+        validator = validator.exists().withMessage(`El campo '${field}' es obligatorio`);
+    } else {
+        validator = validator.optional();
+    }
+    return validator.isMongoId().withMessage(`El campo '${field}' no es un ObjectId válido`);
 };
-
 const validateDate = (attr, required = true) => {
     const validator = body(attr).trim();
     return required
