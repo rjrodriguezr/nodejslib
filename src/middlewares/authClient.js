@@ -41,9 +41,9 @@ const authClient = async (req, res, next) => {
         logger.verbose("[authClient] No sourceType presente por lo que se procesan cabeceras de llamados internos");
         const companyId = req.header(headers.COMPANY_ID);
         const userId = req.header(headers.USER_ID);
-        const roles = req.header(headers.USER_ROLES); // el gateway devuelve como una lista de Strings
+        const username = req.header(headers.USER_NAME); // el gateway devuelve como una lista de Strings
 
-        if (!(companyId || userId || roles)) {
+        if (!(companyId || userId || username)) {
             return res.status(401).json({ error: 'Faltan Headers de datos del usuario' });
         }
 
@@ -51,7 +51,7 @@ const authClient = async (req, res, next) => {
         req.token = {
             companyId,
             userId,
-            roles,
+            username,
         };
         logger.verbose(req.token);
     }

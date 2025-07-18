@@ -14,30 +14,16 @@ class BaseController {
      * Constructor de la clase BaseController
      * 
      * @param {mongoose.Model} model - El modelo de Mongoose que representa la colección a manipular.
-     * @param {boolean} requiresCompanyFilter - Indica si las operaciones deben filtrar automáticamente por el `company` del usuario.
-     *                                           (true = aplica filtro por company, false = no aplica filtro).
-     *                                           Default: true
      * 
      * Ejemplo de uso:
      *    const userController = new BaseController(UserModel, true); // Para usuarios ligados a un company
      *    const configController = new BaseController(ConfigModel, false); // Para configuraciones globales
      */
-    constructor(model, requiresCompanyFilter = true) {
+    constructor(model) {
         this.model = model;
-        this.requiresCompanyFilter = requiresCompanyFilter;
     }
 
-    _getHeaders(req, res) {
-        const company = req.header('X-User-Company');
-        const username = req.header('X-User-Name');
-        if (this.requiresCompanyFilter && (!company || !username)) {
-            res.status(400).json({ message: 'Missing required header: X-User-Company' });
-            return null;
-        }
-        return { company, username };
-    }
-
-    async _dealWithError(res, err, message) {
+    async _handleError(res, err, message) {
         logger.error(err);
         let msg = `${message}. Caused by: ${err.errorResponse?.errmsg || err.message}`;
         res.status(500).json({ message: msg });
@@ -49,7 +35,7 @@ class BaseController {
             if (match[key] === 'false') match[key] = false;
         }
         return match;
-    }    
+    }
 
     /**
      * @function insert
@@ -63,9 +49,14 @@ class BaseController {
      * @returns {void} Responde con el documento creado o un error si ocurre.
      */
     async insert(req, res) {
-        const headers = this._getHeaders(req, res);
-        if (!headers) return;
-        const { company, username } = headers;
+        // authclient sube al request al request los datos del token {companyId, userId, username}
+        if (!req.token) {
+            return res.status(401).json({ message: "Token de autenticación no proporcionado." });
+        }
+
+        const { companyId, username } = req.token;
+
+        if (!username) return res.status(401).json({ message: "username no proporcionado en el token de autenticación." });
 
         const payload = {
             ...req.body,
@@ -73,21 +64,22 @@ class BaseController {
             modified_by: username
         };
 
-        // Solo agregar company si se requiere
-        if (this.requiresCompanyFilter) {
-            payload.company = company;
+        // CompanyId siempre debe agregarse a menos que no se requiera de forma explicita mediante la inyeccion del del atributo NotRequireCompanyFilter
+        // entonces si no existe en el request -> !false -> true y se agrega companyId en el filtro
+        // y si existe en el request -> !true -> false -> no se va a incluir companyId en el filtro
+        if (!req.NotRequireCompanyFilter) {
+            payload.company = companyId;
         }
 
         const doc = new this.model(payload);
 
         doc.save()
             .then(saved => {
-                console.log(saved);
-                res.json({ status: saved })
+                res.json({ status: 'saved', _id: saved._id })
             })
             // 🔥 Cambiado a función flecha para mantener el ambito donde fue creada y no de error con el this              
             .catch(err => {
-                this._dealWithError(res, err, `${this.model.modelName} not created`);
+                this._handleError(res, err, `${this.model.modelName} not created`);
             });
     }
 
@@ -103,34 +95,37 @@ class BaseController {
      * @returns {void} Responde al cliente con un array JSON de los resultados o con un error si ocurre.
      */
     async get(req, res) {
-        const headers = this._getHeaders(req, res);
-        if (!headers) return;
-        const { company } = headers;
-    
         // Clona los parámetros del query
         let query = { ...req.query };
-    
-        // Solo inyecta `company` si se requiere
-        if (this.requiresCompanyFilter) {
-            query.company = company;
+
+        // CompanyId siempre debe agregarse a menos que no se requiera de forma explicita mediante la inyeccion del del atributo NotRequireCompanyFilter
+        // entonces si no existe en el request -> !false -> true y se agrega companyId en el filtro
+        // y si existe en el request -> !true -> false -> no se va a incluir companyId en el filtro
+        if (!req.NotRequireCompanyFilter) {
+            // authclient sube al request al request los datos del token {companyId, userId, username}
+            if (!req.token) {
+                return res.status(401).json({ message: "Token de autenticación no proporcionado." });
+            }
+            const { companyId } = req.token;
+            query.company = companyId;
         }
-    
+
         // Extrae 'fields' del query y lo elimina del objeto de filtros
         const { fields } = query;
         delete query.fields;
-    
+
         // Determinar si estamos buscando un elemento específico por ID
         const isSingleItemQuery = query._id !== undefined;
-    
+
         // Construye la consulta
-        let sql = this.model.find(query);
-    
+        let sql = this.model.find(this._normalizeMatch(query));
+
         // Si hay campos específicos, aplica proyección
         if (fields) {
             const projection = fields.replace(/,/g, ' ');
             sql = sql.select(projection);
         }
-    
+
         // Ejecuta la consulta
         sql.exec()
             .then(result => {
@@ -141,10 +136,10 @@ class BaseController {
                 }
             })
             .catch(err => {
-                this._dealWithError(res, err, `${this.model.modelName} not found`);
+                this._handleError(res, err, `${this.model.modelName} not found`);
             });
     }
-    
+
     /**
      * @function delete
      * @description Desactiva lógicamente un documento (soft delete) usando _id y company como filtro.
@@ -156,14 +151,22 @@ class BaseController {
      * @returns {void} Responde con el documento actualizado o un error.
      */
     async delete(req, res) {
+        // authclient sube al request al request los datos del token {companyId, userId, username}
+        if (!req.token) {
+            return res.status(401).json({ message: "Token de autenticación no proporcionado." });
+        }
         const { id } = req.params;
-        const headers = this._getHeaders(req, res);
-        if (!headers) return;
-        const { company, username } = headers;
+        const { companyId, username } = req.token;
 
+
+        // Construye el filtro para asegurarnos que el usuario elimina un registro para la company a la que pertence
         const filter = { _id: id };
-        if (this.requiresCompanyFilter) {
-            filter.company = company;
+
+        // CompanyId siempre debe agregarse a menos que no se requiera de forma explicita mediante la inyeccion del del atributo NotRequireCompanyFilter
+        // entonces si no existe en el request -> !false -> true y se agrega companyId en el filtro
+        // y si existe en el request -> !true -> false -> no se va a incluir companyId en el filtro
+        if (!req.NotRequireCompanyFilter) {
+            filter.company = companyId;
         }
 
         try {
@@ -175,10 +178,10 @@ class BaseController {
             doc.active = false;
             doc.modified_by = username;
             const saved = await doc.save(); // Dispara los hooks
-            logger.info({ deleted: saved });
-            res.json({ _id: saved._id });
+            logger.info({ status: 'deleted', deleted: saved._id });
+            res.json({ status: 'deleted', deleted: saved._id });
         } catch (err) {
-            this._dealWithError(res, err, `${this.model.modelName} not deleted`);
+            this._handleError(res, err, `${this.model.modelName} not deleted`);
         }
     }
 
@@ -193,17 +196,21 @@ class BaseController {
      * @returns {void} Responde con el documento actualizado o un error.
      */
     async update(req, res) {
+        // authclient sube al request al request los datos del token {companyId, userId, username}
+        if (!req.token) {
+            return res.status(401).json({ message: "Token de autenticación no proporcionado." });
+        }
         const { id } = req.params;
-
-        const headers = this._getHeaders(req, res);
-        if (!headers) return;
-        const { company, username } = headers;
-
+        // authclient sube al request al request los datos del token {companyId, userId, username}
+        const { companyId, username } = req.token;
         const updates = { ...req.body };
 
         const filter = { _id: id };
-        if (this.requiresCompanyFilter) {
-            filter.company = company;
+        // CompanyId siempre debe agregarse a menos que no se requiera de forma explicita mediante la inyeccion del del atributo NotRequireCompanyFilter
+        // entonces si no existe en el request -> !false -> true y se agrega companyId en el filtro
+        // y si existe en el request -> !true -> false -> no se va a incluir companyId en el filtro
+        if (!req.NotRequireCompanyFilter) {
+            filter.company = companyId;
         }
 
         try {
@@ -217,23 +224,24 @@ class BaseController {
             doc.modified_by = username;
 
             const saved = await doc.save(); // Dispara hooks como pre('save')
-            logger.info({ updated: saved });
-            res.json({ _id: saved._id });
+            logger.info({ status: 'updated', updated: saved._id });
+            res.json({ status: 'updated', updated: saved._id });
         } catch (err) {
-            this._dealWithError(res, err, `${this.model.modelName} not updated`);
+            this._handleError(res, err, `${this.model.modelName} not updated`);
         }
     }
 
     async echo(req, res) {
-        const { company, username } = this._getHeaders(req);
+        // authclient sube al request al request los datos del token {companyId, userId, username}
+        const { companyId, username, userId } = req.token;
+        logger.info({ companyId, username, userId });
         try {
             if (req.method === "GET") {
-                res.json({ message: `GET ECHO: Dummy ok`, company, username });
+                res.json({ message: `GET ECHO: Dummy ok` });
             } else {
-                res.json({ message: `POST ECHO: Dummy ok`, body: req.body, company, username });
+                res.json({ message: `POST ECHO: Dummy ok` });
             }
         } catch (error) {
-
             logger.error(error.stack)
             return res.status(500).json({
                 error: error.message
