@@ -14,7 +14,6 @@ const logger = require('./lib/logger');
 const { authClient, middlewareHandleError, modelAuditPlugin, responseHandleError } = require('./src/middlewares');
 const mongoDBService = require('./lib/mongoDBService');
 const redisService = require('./lib/redisService');
-const serviceRegistry = require('./lib/serviceRegistry');
 const { buildDeleteValidator, buildGetValidator, buildSaveValidator, buildUpdateValidator,
   fieldsValidator, validateDate, validateEmail, validateMongoId, validateNumber, validateText } = require('./src/validators');
 
@@ -29,7 +28,6 @@ module.exports = {
   authClient, middlewareHandleError, modelAuditPlugin, responseHandleError,
   mongoDBService,
   redisService,
-  serviceRegistry,
   buildDeleteValidator, buildGetValidator, buildSaveValidator, buildUpdateValidator,
   fieldsValidator, validateDate, validateEmail, validateMongoId, validateNumber, validateText,
 };
