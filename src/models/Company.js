@@ -1,6 +1,7 @@
 const logger = require('../../lib/logger');
 const { Schema, model } = require('mongoose');
 const { modelAuditPlugin } = require('../middlewares');
+const { companyService } = require('../services');
 
 const CompanySchema = Schema({
   name: {
@@ -119,7 +120,7 @@ CompanySchema.post('findOneAndUpdate', async function (doc) {
   // `this` es la Query.
   if (doc) { // Verificar que `doc` no sea null (si no se encontró el documento para actualizar)
     try {
-      const { saveCompanySettingInRedis } = require('../services');
+      const { saveCompanySettingInRedis } = companyService;
       await saveCompanySettingInRedis(doc);
     } catch (error) {
       logger.error('Error al actualizar configuración en Redis tras "findOneAndUpdate":', error);
@@ -130,7 +131,7 @@ CompanySchema.post('findOneAndUpdate', async function (doc) {
 // Hook para guardar en Redis después de cada save o update
 CompanySchema.post('save', async function (doc) {
   try {
-    const { saveCompanySettingInRedis } = require('../services');
+    const { saveCompanySettingInRedis } = companyService;
     await saveCompanySettingInRedis(doc);
   } catch (error) {
     logger.error('Error al guardar configuración en Redis:', error);
