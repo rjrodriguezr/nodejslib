@@ -8,6 +8,7 @@ const axiosClient = require('./lib/axiosClient');
 const catalog = require('./lib/catalog');
 const constants = require('./lib/constants');
 const { BaseController } = require('./src/controllers');
+const { companyService } = require('./src/services');
 const { Company, User, Customer } = require('./src/models');
 const crypt = require('./lib/crypt');
 const logger = require('./lib/logger');
@@ -21,6 +22,7 @@ module.exports = {
   axiosClient,
   catalog,
   constants,
+  companyService,
   BaseController,
   Company, User, Customer,
   crypt,
