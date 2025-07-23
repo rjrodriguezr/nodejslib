@@ -53,7 +53,7 @@ const authClient = async (req, res, next) => {
             userId,
             username,
         };
-        logger.verbose(req.token);
+        logger.verbose({file:'[authClient]',token:req.token});
     }
 
     next();
