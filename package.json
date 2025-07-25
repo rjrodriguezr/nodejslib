@@ -1,6 +1,6 @@
 {
   "name": "nodejslib",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "description": "Libreria de utilidades para aplicaciones back-end con nodejs",
   "main": "./index.js",
   "scripts": {
