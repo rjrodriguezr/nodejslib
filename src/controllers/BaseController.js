@@ -25,7 +25,8 @@ class BaseController {
 
     async handleError(res, err, message) {
         logger.error(err);
-        let msg = `${message}. Caused by: ${err.errorResponse?.errmsg || err.message}`;
+        let cause = `Caused by: ${err.errorResponse?.errmsg || err.message}`;
+        let msg = message ? `${message}. ${cause}` : cause;
         res.status(500).json({ message: msg });
     }
 
