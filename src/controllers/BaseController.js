@@ -23,7 +23,7 @@ class BaseController {
         this.model = model;
     }
 
-    async _handleError(res, err, message) {
+    async handleError(res, err, message) {
         logger.error(err);
         let msg = `${message}. Caused by: ${err.errorResponse?.errmsg || err.message}`;
         res.status(500).json({ message: msg });
@@ -79,7 +79,7 @@ class BaseController {
             })
             // 🔥 Cambiado a función flecha para mantener el ambito donde fue creada y no de error con el this              
             .catch(err => {
-                this._handleError(res, err, `${this.model.modelName} not created`);
+                this.handleError(res, err, `${this.model.modelName} not created`);
             });
     }
 
@@ -136,7 +136,7 @@ class BaseController {
                 }
             })
             .catch(err => {
-                this._handleError(res, err, `${this.model.modelName} not found`);
+                this.handleError(res, err, `${this.model.modelName} not found`);
             });
     }
 
@@ -181,7 +181,7 @@ class BaseController {
             logger.info({ status: 'deleted', deleted: saved._id });
             res.json({ status: 'deleted', deleted: saved._id });
         } catch (err) {
-            this._handleError(res, err, `${this.model.modelName} not deleted`);
+            this.handleError(res, err, `${this.model.modelName} not deleted`);
         }
     }
 
@@ -227,7 +227,7 @@ class BaseController {
             logger.info({ status: 'updated', updated: saved._id });
             res.json({ status: 'updated', updated: saved._id });
         } catch (err) {
-            this._handleError(res, err, `${this.model.modelName} not updated`);
+            this.handleError(res, err, `${this.model.modelName} not updated`);
         }
     }
 
