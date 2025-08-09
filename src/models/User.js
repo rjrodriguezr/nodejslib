@@ -63,6 +63,11 @@ const UserSchema = new Schema({
             maxlength: 200,
             default: ''
         },
+        gender: {
+            type: String,
+            enum: Object.values(['M', 'F']),
+            default: 'M'
+        },
         language: {
             type: String,
             enum: Object.values(['es', 'en', 'pt']),
