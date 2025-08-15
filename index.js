@@ -9,7 +9,7 @@ const catalog = require('./lib/catalog');
 const constants = require('./lib/constants');
 const { BaseController } = require('./src/controllers');
 const { companyService } = require('./src/services');
-const { Company, User, Customer } = require('./src/models');
+const { Company, User, Customer, Message } = require('./src/models');
 const crypt = require('./lib/crypt');
 const logger = require('./lib/logger');
 const { authClient, middlewareHandleError, modelAuditPlugin, responseHandleError } = require('./src/middlewares');
@@ -24,7 +24,7 @@ module.exports = {
   constants,
   companyService,
   BaseController,
-  Company, User, Customer,
+  Company, User, Customer, Message,
   crypt,
   logger,
   authClient, middlewareHandleError, modelAuditPlugin, responseHandleError,
